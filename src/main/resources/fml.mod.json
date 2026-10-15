@@ -12,6 +12,7 @@
     "main": ["com.bountifulbaubles.BountifulBaubles"],
     "registry": ["com.bountifulbaubles.registry.BountifulBaublesRegistry"]
   },
+  "mixins": ["bountifulbaubles.mixins.json"],
   "depends": {
     "fishmodloader": ">=3.4.0",
     "minecraft": "1.6.4-mite",
