@@ -4,6 +4,7 @@ import com.bountifulbaubles.BountifulBaubles;
 import com.bountifulbaubles.item.BBCurioItem;
 import com.bountifulbaubles.item.BBItem;
 import com.bountifulbaubles.item.BBTeleportItem;
+import com.bountifulbaubles.item.DiggingGlovesItem;
 import com.bountifulbaubles.equipment.BBEffects;
 import huix.glacier.api.entrypoint.IGameRegistry;
 import huix.glacier.api.registry.MinecraftRegistry;
@@ -115,8 +116,8 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         BBEffects.addPhylactery(phylactery_charm);
         amulet_cross = register("amulet_cross", "necklace");
         gloves_dexterity = register("gloves_dexterity", "hands");
-        gloves_digging_iron = register("gloves_digging_iron", "hands");
-        gloves_digging_diamond = register("gloves_digging_diamond", "hands");
+        gloves_digging_iron = registerCurio("gloves_digging_iron", new DiggingGlovesItem(false));
+        gloves_digging_diamond = registerCurio("gloves_digging_diamond", new DiggingGlovesItem(true));
         ender_dragon_scale = registerItem("ender_dragon_scale");
         broken_black_dragon_scale = registerItem("broken_black_dragon_scale");
         magic_mirror = registerItem("magic_mirror", new BBTeleportItem(false));
@@ -130,8 +131,12 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
     }
 
     private static BBCurioItem register(String path, String... slots) {
-        BBCurioItem item = (BBCurioItem) REGISTRY.registerItem(
-            BountifulBaubles.MOD_ID + ":" + path, path, new BBCurioItem(slots)
+        return registerCurio(path, new BBCurioItem(slots));
+    }
+
+    private static BBCurioItem registerCurio(String path, BBCurioItem item) {
+        item = (BBCurioItem) REGISTRY.registerItem(
+            BountifulBaubles.MOD_ID + ":" + path, path, item
         );
         ((IItem) item).setItemTextureName(BountifulBaubles.MOD_ID + ":" + path);
         return item;

@@ -4,6 +4,6 @@
   "package": "com.bountifulbaubles.mixin",
   "compatibilityLevel": "JAVA_17",
   "target": "DEFAULT",
-  "mixins": ["ContainerRepairMixin", "EntityLivingBaseMixin", "EntityPlayerMixin"],
+  "mixins": ["ContainerRepairMixin", "EntityLivingBaseMixin", "EntityPlayerMixin", "EntityPlayerDiggingMixin", "ItemInWorldManagerDiggingMixin"],
   "injectors": {"defaultRequire": 1}
 }
