@@ -23,8 +23,19 @@ public abstract class EntityLivingBaseMixin {
         if (BBEffects.isFireImmune((EntityLivingBase) (Object) this)) cir.setReturnValue(false);
     }
 
-    @Inject(method = "isHarmedByLava()Z", at = @At("HEAD"), cancellable = true)
-    private void bountifulbaubles$lavaImmunity(CallbackInfoReturnable<Boolean> cir) {
-        if (BBEffects.isFireImmune((EntityLivingBase) (Object) this)) cir.setReturnValue(false);
+    @Inject(method = "fall(F)V", at = @At("HEAD"), cancellable = true)
+    private void bountifulbaubles$fallImmunity(float distance, CallbackInfo info) {
+        if (BBEffects.isFallImmune((EntityLivingBase) (Object) this)) info.cancel();
+    }
+
+    @org.spongepowered.asm.mixin.injection.ModifyVariable(method = "fall(F)V", at = @At("HEAD"), argsOnly = true)
+    private float bountifulbaubles$fallResistance(float distance) {
+        return BBEffects.reduceFallDistance((EntityLivingBase) (Object) this, distance);
+    }
+
+    @Inject(method = "jump()V", at = @At("TAIL"))
+    private void bountifulbaubles$jumpBoost(CallbackInfo info) {
+        ((EntityLivingBase) (Object) this).motionY +=
+            BBEffects.getJumpBoost((EntityLivingBase) (Object) this);
     }
 }

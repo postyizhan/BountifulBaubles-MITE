@@ -67,6 +67,7 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         shulker_heart = register("shulker_heart", "necklace", "ring");
         ring_free_action = register("ring_free_action", "ring");
         BBEffects.addPotionImmunity(ring_free_action, net.minecraft.Potion.moveSlowdown.id);
+        BBEffects.addWebImmunity(ring_free_action);
         bezoar = register("bezoar", "necklace", "ring");
         BBEffects.addPotionImmunity(bezoar, net.minecraft.Potion.poison.id);
         black_dragon_scale = register("black_dragon_scale", "necklace", "ring");
@@ -79,14 +80,25 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
             net.minecraft.Potion.moveSlowdown.id, net.minecraft.Potion.poison.id, net.minecraft.Potion.wither.id);
         obsidian_skull = register("obsidian_skull", "necklace", "ring");
         BBEffects.addFireImmunity(obsidian_skull);
-        shield_cobalt = register("shield_cobalt", "back");
-        shield_obsidian = register("shield_obsidian", "back");
+        shield_cobalt = register("shield_cobalt", "back")
+            .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "cobalt_shield", 10, 0);
+        shield_obsidian = register("shield_obsidian", "back")
+            .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "obsidian_shield", 10, 0);
         BBEffects.addFireImmunity(shield_obsidian);
-        shield_ankh = register("shield_ankh", "back");
+        shield_ankh = register("shield_ankh", "back")
+            .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "ankh_shield", 10, 0);
         BBEffects.addFireImmunity(shield_ankh);
+        BBEffects.addPotionImmunity(shield_ankh, net.minecraft.Potion.blindness.id, net.minecraft.Potion.hunger.id,
+            net.minecraft.Potion.confusion.id, net.minecraft.Potion.weakness.id, net.minecraft.Potion.digSlowdown.id,
+            net.minecraft.Potion.moveSlowdown.id, net.minecraft.Potion.poison.id, net.minecraft.Potion.wither.id);
         balloon = register("balloon", "necklace", "ring");
+        BBEffects.addFallResistance(balloon, 4.0F);
+        BBEffects.addJumpBoost(balloon, 0.2F);
         lucky_horseshoe = register("lucky_horseshoe", "necklace", "ring");
+        BBEffects.addFallImmunity(lucky_horseshoe);
         horseshoe_balloon = register("horseshoe_balloon", "necklace", "ring");
+        BBEffects.addFallImmunity(horseshoe_balloon);
+        BBEffects.addJumpBoost(horseshoe_balloon, 0.2F);
         amulet_sin_gluttony = register("amulet_sin_gluttony", "necklace");
         amulet_sin_pride = register("amulet_sin_pride", "necklace");
         amulet_sin_wrath = register("amulet_sin_wrath", "necklace")
