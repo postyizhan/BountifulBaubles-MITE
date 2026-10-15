@@ -1,6 +1,20 @@
 {
   "replace": false,
   "values": [
-    "bountifulbaubles:example_ring"
+    "bountifulbaubles:apple",
+    "bountifulbaubles:vitamins",
+    "bountifulbaubles:ring_overclocking",
+    "bountifulbaubles:shulker_heart",
+    "bountifulbaubles:ring_free_action",
+    "bountifulbaubles:bezoar",
+    "bountifulbaubles:black_dragon_scale",
+    "bountifulbaubles:mixed_dragon_scale",
+    "bountifulbaubles:ankh_charm",
+    "bountifulbaubles:obsidian_skull",
+    "bountifulbaubles:balloon",
+    "bountifulbaubles:lucky_horseshoe",
+    "bountifulbaubles:horseshoe_balloon",
+    "bountifulbaubles:broken_heart",
+    "bountifulbaubles:phylactery_charm"
   ]
 }
