@@ -3,11 +3,13 @@ package com.bountifulbaubles.registry;
 import com.bountifulbaubles.BountifulBaubles;
 import com.bountifulbaubles.item.BBCurioItem;
 import com.bountifulbaubles.item.BBItem;
+import com.bountifulbaubles.item.BBShieldItem;
 import com.bountifulbaubles.item.BBTeleportItem;
 import com.bountifulbaubles.item.DiggingGlovesItem;
 import com.bountifulbaubles.equipment.BBEffects;
 import huix.glacier.api.entrypoint.IGameRegistry;
 import huix.glacier.api.registry.MinecraftRegistry;
+import net.minecraft.Block;
 import net.minecraft.Item;
 import net.xiaoyu233.fml.api.item.IItem;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -83,13 +85,13 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         obsidian_skull = register("obsidian_skull", "necklace", "ring");
         BBEffects.addFireImmunity(obsidian_skull);
         BBEffects.addFireDamageResistance(obsidian_skull, 0.5F);
-        shield_cobalt = register("shield_cobalt", "back")
+        shield_cobalt = registerCurio("shield_cobalt", new BBShieldItem(1008, Item.ingotIron, net.minecraft.Material.iron))
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "cobalt_shield", 10, 0);
-        shield_obsidian = register("shield_obsidian", "back")
+        shield_obsidian = registerCurio("shield_obsidian", new BBShieldItem(1344, Item.getItem(Block.obsidian), net.minecraft.Material.obsidian))
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "obsidian_shield", 10, 0);
         BBEffects.addFireImmunity(shield_obsidian);
         BBEffects.addFireDamageResistance(shield_obsidian, 0.5F);
-        shield_ankh = register("shield_ankh", "back")
+        shield_ankh = registerCurio("shield_ankh", new BBShieldItem(1680, Item.getItem(Block.obsidian), net.minecraft.Material.obsidian))
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "ankh_shield", 10, 0);
         BBEffects.addFireImmunity(shield_ankh);
         BBEffects.addFireDamageResistance(shield_ankh, 0.5F);
