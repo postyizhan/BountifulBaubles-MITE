@@ -1,6 +1,7 @@
 package com.bountifulbaubles.mixin;
 
 import com.bountifulbaubles.equipment.DiggingEquipment;
+import com.bountifulbaubles.equipment.DiggingContext;
 import net.minecraft.Block;
 import net.minecraft.BlockBreakInfo;
 import net.minecraft.EntityLivingBase;
@@ -44,9 +45,7 @@ public abstract class ItemInWorldManagerDiggingMixin {
         BlockBreakInfo info, EntityLivingBase harvester) {
         BlockBreakInfo harvested = info.setHarvestedBy(harvester);
         ItemStack glove = bountifulbaubles$currentGlove();
-        if (glove != null) {
-            harvested.responsible_item_stack = glove;
-        }
+        if (glove != null) harvested.responsible_item_stack = glove;
         return harvested;
     }
 
@@ -75,15 +74,7 @@ public abstract class ItemInWorldManagerDiggingMixin {
     @Unique
     private ItemStack bountifulbaubles$currentGlove() {
         java.util.Deque<DiggingContext> contexts = bountifulbaubles$diggingContexts.get();
-        return contexts.isEmpty() ? null : contexts.peek().glove;
+        return contexts.isEmpty() ? null : contexts.peek().getGlove();
     }
 
-    @Unique
-    private static final class DiggingContext {
-        private final ItemStack glove;
-
-        private DiggingContext(ItemStack glove) {
-            this.glove = glove;
-        }
-    }
 }

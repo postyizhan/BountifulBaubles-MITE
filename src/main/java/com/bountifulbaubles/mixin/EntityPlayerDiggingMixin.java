@@ -1,6 +1,7 @@
 package com.bountifulbaubles.mixin;
 
 import com.bountifulbaubles.equipment.DiggingEquipment;
+import com.bountifulbaubles.equipment.MiningContext;
 import net.minecraft.Block;
 import net.minecraft.Enchantment;
 import net.minecraft.EnchantmentHelper;
@@ -38,10 +39,10 @@ public abstract class EntityPlayerDiggingMixin {
     private Item bountifulbaubles$useDiggingGlove(EntityPlayer player) {
         Item heldItem = player.getHeldItem();
         MiningContext context = bountifulbaubles$currentMiningContext();
-        if (context == null || !context.includeHeldItem) return heldItem;
+        if (context == null || !context.includesHeldItem()) return heldItem;
 
-        Block block = player.worldObj.getBlock(context.x, context.y, context.z);
-        int metadata = player.worldObj.getBlockMetadata(context.x, context.y, context.z);
+        Block block = player.worldObj.getBlock(context.getX(), context.getY(), context.getZ());
+        int metadata = player.worldObj.getBlockMetadata(context.getX(), context.getY(), context.getZ());
         ItemStack glove = DiggingEquipment.getApplicableGlove(player, block, metadata);
         return glove == null ? heldItem : glove.getItem();
     }
@@ -56,12 +57,12 @@ public abstract class EntityPlayerDiggingMixin {
     private int bountifulbaubles$addGloveEfficiency(EntityLivingBase entity) {
         int level = EnchantmentHelper.getEfficiencyModifier(entity);
         MiningContext context = bountifulbaubles$currentMiningContext();
-        if (context == null || !context.includeHeldItem || !(entity instanceof EntityPlayer)) return level;
+        if (context == null || !context.includesHeldItem() || !(entity instanceof EntityPlayer)) return level;
 
         EntityPlayer player = (EntityPlayer) entity;
-        Block block = player.worldObj.getBlock(context.x, context.y, context.z);
+        Block block = player.worldObj.getBlock(context.getX(), context.getY(), context.getZ());
         ItemStack glove = DiggingEquipment.getApplicableGlove(
-            player, block, player.worldObj.getBlockMetadata(context.x, context.y, context.z));
+            player, block, player.worldObj.getBlockMetadata(context.getX(), context.getY(), context.getZ()));
         return glove == null ? level : level + EnchantmentHelper.getEnchantmentLevel(Enchantment.efficiency, glove);
     }
 
@@ -79,18 +80,4 @@ public abstract class EntityPlayerDiggingMixin {
         return contexts.isEmpty() ? null : contexts.peek();
     }
 
-    @Unique
-    private static final class MiningContext {
-        private final int x;
-        private final int y;
-        private final int z;
-        private final boolean includeHeldItem;
-
-        private MiningContext(int x, int y, int z, boolean includeHeldItem) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.includeHeldItem = includeHeldItem;
-        }
-    }
 }
