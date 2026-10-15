@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Bountiful Baubles port for Minecraft 1.6.4 MITE.",
+  "authors": ["BountifulBaubles-MITE contributors"],
+  "license": "All Rights Reserved",
+  "icon": "assets/bountifulbaubles/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.bountifulbaubles.BountifulBaubles"],
+    "registry": ["com.bountifulbaubles.registry.BountifulBaublesRegistry"]
+  },
+  "depends": {
+    "fishmodloader": ">=3.4.0",
+    "minecraft": "1.6.4-mite",
+    "java": ">=17",
+    "rusted_iron_core": ">=1.3.5",
+    "curios": "*"
+  }
+}
