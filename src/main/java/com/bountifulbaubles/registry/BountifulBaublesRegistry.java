@@ -7,6 +7,7 @@ import com.bountifulbaubles.equipment.BBEffects;
 import huix.glacier.api.entrypoint.IGameRegistry;
 import huix.glacier.api.registry.MinecraftRegistry;
 import net.minecraft.Item;
+import net.xiaoyu233.fml.api.item.IItem;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypePreset;
 
@@ -109,9 +110,11 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
     }
 
     private static BBCurioItem register(String path, String... slots) {
-        return (BBCurioItem) REGISTRY.registerItem(
+        BBCurioItem item = (BBCurioItem) REGISTRY.registerItem(
             BountifulBaubles.MOD_ID + ":" + path, path, new BBCurioItem(slots)
         );
+        ((IItem) item).setItemTextureName(BountifulBaubles.MOD_ID + ":" + path);
+        return item;
     }
 
     private static Item registerItem(String path) {
@@ -119,9 +122,11 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
     }
 
     private static Item registerItem(String path, int maxStackSize) {
-        return REGISTRY.registerItem(
+        Item item = REGISTRY.registerItem(
             BountifulBaubles.MOD_ID + ":" + path, path, new BBItem(maxStackSize)
         );
+        ((IItem) item).setItemTextureName(BountifulBaubles.MOD_ID + ":" + path);
+        return item;
     }
 
     private static void registerSlots() {
