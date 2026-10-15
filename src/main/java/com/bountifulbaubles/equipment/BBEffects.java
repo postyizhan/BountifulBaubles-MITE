@@ -25,6 +25,16 @@ public final class BBEffects {
         new IdentityHashMap<Item, Float>();
     private static final Set<Item> WEB_IMMUNITY =
         Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> STEP_ASSIST =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> FAST_FOOD =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Map<Item, Float> FIRE_DAMAGE_MULTIPLIER =
+        new IdentityHashMap<Item, Float>();
+
+    private static final float VANILLA_STEP_HEIGHT = 0.6F;
+    private static final float ASSISTED_STEP_HEIGHT = 1.24993F;
+    private static final float SNEAKING_STEP_HEIGHT = 0.60007F;
 
     private BBEffects() {}
 
@@ -51,6 +61,18 @@ public final class BBEffects {
 
     public static synchronized void addWebImmunity(Item item) {
         WEB_IMMUNITY.add(item);
+    }
+
+    public static synchronized void addStepAssist(Item item) {
+        STEP_ASSIST.add(item);
+    }
+
+    public static synchronized void addFastFood(Item item) {
+        FAST_FOOD.add(item);
+    }
+
+    public static synchronized void addFireDamageResistance(Item item, float multiplier) {
+        FIRE_DAMAGE_MULTIPLIER.put(item, multiplier);
     }
 
     public static boolean canApplyPotion(EntityLivingBase entity, int potionId) {
@@ -80,6 +102,24 @@ public final class BBEffects {
         return hasEquippedItem(entity, WEB_IMMUNITY::contains);
     }
 
+    public static void updateStepHeight(net.minecraft.EntityPlayer player) {
+        if (hasEquippedItem(player, STEP_ASSIST::contains)) {
+            player.stepHeight = player.isSneaking() ? SNEAKING_STEP_HEIGHT : ASSISTED_STEP_HEIGHT;
+        } else if (player.stepHeight == ASSISTED_STEP_HEIGHT || player.stepHeight == SNEAKING_STEP_HEIGHT) {
+            player.stepHeight = VANILLA_STEP_HEIGHT;
+        }
+    }
+
+    public static boolean hasFastFood(EntityLivingBase entity) {
+        return hasEquippedItem(entity, FAST_FOOD::contains);
+    }
+
+    public static void reduceFireDamage(EntityLivingBase entity, net.minecraft.Damage damage) {
+        if (entity == null || damage == null || !damage.isFireDamage() || damage.isLavaDamage()) return;
+        float multiplier = getEquippedMinimum(entity, FIRE_DAMAGE_MULTIPLIER, 1.0F);
+        if (multiplier > 0.0F && multiplier < 1.0F) damage.scaleAmount(multiplier);
+    }
+
     private static boolean hasEquippedItem(EntityLivingBase entity, java.util.function.Predicate<Item> predicate) {
         if (entity == null) return false;
         return CuriosApi.getCuriosHelper().getEquippedCurios(entity).map(stacks -> {
@@ -104,5 +144,20 @@ public final class BBEffects {
             }
             return total;
         }).orElse(0.0F);
+    }
+
+    private static float getEquippedMinimum(EntityLivingBase entity, Map<Item, Float> amounts, float defaultValue) {
+        if (entity == null) return defaultValue;
+        return CuriosApi.getCuriosHelper().getEquippedCurios(entity).map(stacks -> {
+            float minimum = defaultValue;
+            for (int index = 0; index < stacks.getSlots(); index++) {
+                ItemStack stack = stacks.getStackInSlot(index);
+                if (stack != null && stack.getItem() != null) {
+                    Float amount = amounts.get(stack.getItem());
+                    if (amount != null && amount < minimum) minimum = amount;
+                }
+            }
+            return minimum;
+        }).orElse(defaultValue);
     }
 }

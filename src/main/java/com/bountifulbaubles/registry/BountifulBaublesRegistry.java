@@ -81,14 +81,17 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
             net.minecraft.Potion.moveSlowdown.id, net.minecraft.Potion.poison.id, net.minecraft.Potion.wither.id);
         obsidian_skull = register("obsidian_skull", "necklace", "ring");
         BBEffects.addFireImmunity(obsidian_skull);
+        BBEffects.addFireDamageResistance(obsidian_skull, 0.5F);
         shield_cobalt = register("shield_cobalt", "back")
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "cobalt_shield", 10, 0);
         shield_obsidian = register("shield_obsidian", "back")
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "obsidian_shield", 10, 0);
         BBEffects.addFireImmunity(shield_obsidian);
+        BBEffects.addFireDamageResistance(shield_obsidian, 0.5F);
         shield_ankh = register("shield_ankh", "back")
             .addModifier(net.minecraft.SharedMonsterAttributes.knockbackResistance, "ankh_shield", 10, 0);
         BBEffects.addFireImmunity(shield_ankh);
+        BBEffects.addFireDamageResistance(shield_ankh, 0.5F);
         BBEffects.addPotionImmunity(shield_ankh, net.minecraft.Potion.blindness.id, net.minecraft.Potion.hunger.id,
             net.minecraft.Potion.confusion.id, net.minecraft.Potion.weakness.id, net.minecraft.Potion.digSlowdown.id,
             net.minecraft.Potion.moveSlowdown.id, net.minecraft.Potion.poison.id, net.minecraft.Potion.wither.id);
@@ -101,7 +104,9 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         BBEffects.addFallImmunity(horseshoe_balloon);
         BBEffects.addJumpBoost(horseshoe_balloon, 0.2F);
         amulet_sin_gluttony = register("amulet_sin_gluttony", "necklace");
+        BBEffects.addFastFood(amulet_sin_gluttony);
         amulet_sin_pride = register("amulet_sin_pride", "necklace");
+        BBEffects.addStepAssist(amulet_sin_pride);
         amulet_sin_wrath = register("amulet_sin_wrath", "necklace")
             .addModifier(net.minecraft.SharedMonsterAttributes.attackDamage, "wrath", 2, 0);
         broken_heart = register("broken_heart", "necklace", "ring");
