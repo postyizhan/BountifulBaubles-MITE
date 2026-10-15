@@ -24,6 +24,21 @@ dependencies {
 }
 
 def fmlResolvedFile = configurations.fml.singleFile
+def curiosRuntimeJar = file('../Curios-MITE/build/libs/curios-mite-0.1.0.jar')
+
+def syncCuriosRuntimeMod = tasks.register('syncCuriosRuntimeMod', Copy) {
+    from(curiosRuntimeJar)
+    into(layout.projectDirectory.dir('run/mods'))
+    doFirst {
+        if (!curiosRuntimeJar.isFile()) {
+            throw new GradleException("Curios-MITE runtime jar not found at ${curiosRuntimeJar}; build Curios-MITE first.")
+        }
+    }
+}
+
+tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
+    dependsOn(syncCuriosRuntimeMod)
+}
 
 loom {
     accessWidenerPath = file('src/main/resources/bountifulbaubles.accesswidener')
