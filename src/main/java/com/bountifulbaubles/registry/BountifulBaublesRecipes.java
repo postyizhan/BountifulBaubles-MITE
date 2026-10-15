@@ -17,6 +17,7 @@ public final class BountifulBaublesRecipes {
         Handlers.Initialization.register(new IInitializationListener() {
             @Override
             public void onServerStarted(MinecraftServer server) {
+                BountifulBaublesAnvilRecipes.register();
                 registerRecipes();
             }
         });
