@@ -3,6 +3,7 @@ package com.bountifulbaubles.registry;
 import com.bountifulbaubles.BountifulBaubles;
 import com.bountifulbaubles.item.BBCurioItem;
 import com.bountifulbaubles.item.BBItem;
+import com.bountifulbaubles.item.BBTeleportItem;
 import com.bountifulbaubles.equipment.BBEffects;
 import huix.glacier.api.entrypoint.IGameRegistry;
 import huix.glacier.api.registry.MinecraftRegistry;
@@ -111,10 +112,10 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         gloves_digging_diamond = register("gloves_digging_diamond", "hands");
         ender_dragon_scale = registerItem("ender_dragon_scale");
         broken_black_dragon_scale = registerItem("broken_black_dragon_scale");
-        magic_mirror = registerItem("magic_mirror", 1);
-        potion_recall = registerItem("potion_recall");
-        wormhole_mirror = registerItem("wormhole_mirror", 1);
-        potion_wormhole = registerItem("potion_wormhole");
+        magic_mirror = registerItem("magic_mirror", new BBTeleportItem(false));
+        potion_recall = registerItem("potion_recall", new BBTeleportItem(true));
+        wormhole_mirror = registerItem("wormhole_mirror", new BBTeleportItem(false));
+        potion_wormhole = registerItem("potion_wormhole", new BBTeleportItem(true));
         amulet_sin_empty = registerItem("amulet_sin_empty");
         disintegration_tablet = registerItem("disintegration_tablet", 1);
         spectral_silt = registerItem("spectral_silt");
@@ -134,9 +135,11 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
     }
 
     private static Item registerItem(String path, int maxStackSize) {
-        Item item = REGISTRY.registerItem(
-            BountifulBaubles.MOD_ID + ":" + path, path, new BBItem(maxStackSize)
-        );
+        return registerItem(path, new BBItem(maxStackSize));
+    }
+
+    private static Item registerItem(String path, Item item) {
+        item = REGISTRY.registerItem(BountifulBaubles.MOD_ID + ":" + path, path, item);
         ((IItem) item).setItemTextureName(BountifulBaubles.MOD_ID + ":" + path);
         return item;
     }
