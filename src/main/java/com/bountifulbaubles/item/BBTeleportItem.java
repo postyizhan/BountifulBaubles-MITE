@@ -28,16 +28,20 @@ public final class BBTeleportItem extends BBItem {
     @Override
     public void onItemUseFinish(ItemStack stack, World world, EntityPlayer player) {
         if (player.onServer()) {
-            ChunkCoordinates target = player.getBedLocation();
-            if (target == null) target = world.getSpawnPoint();
-            if (target != null) {
-                player.setPositionAndUpdate(target.posX + 0.5D, target.posY + 1.0D, target.posZ + 0.5D);
-                player.fallDistance = 0.0F;
-            }
+            teleportToSpawn(player, world);
             if (consumesStack && !player.inCreativeMode()) {
                 player.convertOneOfHeldItem(new ItemStack(Item.glassBottle));
             }
         }
         super.onItemUseFinish(stack, world, player);
+    }
+
+    public static void teleportToSpawn(EntityPlayer player, World world) {
+        ChunkCoordinates target = player.getBedLocation();
+        if (target == null) target = world.getSpawnPoint();
+        if (target != null) {
+            player.setPositionAndUpdate(target.posX + 0.5D, target.posY + 1.0D, target.posZ + 0.5D);
+            player.fallDistance = 0.0F;
+        }
     }
 }

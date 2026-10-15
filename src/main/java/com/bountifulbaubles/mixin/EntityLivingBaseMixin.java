@@ -6,6 +6,7 @@ import net.minecraft.PotionEffect;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -37,5 +38,18 @@ public abstract class EntityLivingBaseMixin {
     private void bountifulbaubles$jumpBoost(CallbackInfo info) {
         ((EntityLivingBase) (Object) this).motionY +=
             BBEffects.getJumpBoost((EntityLivingBase) (Object) this);
+    }
+
+    @ModifyArg(
+        method = "attackEntityFromHelper(Lnet/minecraft/Damage;Lnet/minecraft/EntityDamageResult;)Lnet/minecraft/EntityDamageResult;",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;setHealth(F)V"),
+        index = 0)
+    private float bountifulbaubles$preventPlayerDeath(float healthAfter) {
+        EntityLivingBase entity = (EntityLivingBase) (Object) this;
+        if (healthAfter <= 0.0F && entity instanceof net.minecraft.EntityPlayer) {
+            net.minecraft.EntityPlayer player = (net.minecraft.EntityPlayer) entity;
+            if (BBEffects.preventDeath(player, healthAfter)) return player.getHealth();
+        }
+        return healthAfter;
     }
 }

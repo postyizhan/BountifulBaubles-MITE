@@ -6,13 +6,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import net.minecraft.EntityLivingBase;
+import net.minecraft.EntityPlayer;
+import net.minecraft.AttributeInstance;
+import net.minecraft.AttributeModifier;
 import net.minecraft.Item;
 import net.minecraft.ItemStack;
+import net.minecraft.SharedMonsterAttributes;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 /** Shared effect lookups for the MITE port. All checks use Curios equipment state. */
 public final class BBEffects {
+    private static final java.util.UUID MAX_HEALTH_DRAIN_ID =
+        java.util.UUID.fromString("554f3929-4193-4ae5-a4da-4b528a89ca32");
     private static final Map<Item, Set<Integer>> POTION_IMMUNITY =
         new IdentityHashMap<Item, Set<Integer>>();
     private static final Set<Item> FIRE_IMMUNITY =
@@ -31,6 +37,10 @@ public final class BBEffects {
         Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
     private static final Map<Item, Float> FIRE_DAMAGE_MULTIPLIER =
         new IdentityHashMap<Item, Float>();
+    private static final Set<Item> BROKEN_HEART =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> PHYLACTERY =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
 
     private static final float VANILLA_STEP_HEIGHT = 0.6F;
     private static final float ASSISTED_STEP_HEIGHT = 1.24993F;
@@ -73,6 +83,14 @@ public final class BBEffects {
 
     public static synchronized void addFireDamageResistance(Item item, float multiplier) {
         FIRE_DAMAGE_MULTIPLIER.put(item, multiplier);
+    }
+
+    public static synchronized void addBrokenHeart(Item item) {
+        BROKEN_HEART.add(item);
+    }
+
+    public static synchronized void addPhylactery(Item item) {
+        PHYLACTERY.add(item);
     }
 
     public static boolean canApplyPotion(EntityLivingBase entity, int potionId) {
@@ -118,6 +136,30 @@ public final class BBEffects {
         if (entity == null || damage == null || !damage.isFireDamage() || damage.isLavaDamage()) return;
         float multiplier = getEquippedMinimum(entity, FIRE_DAMAGE_MULTIPLIER, 1.0F);
         if (multiplier > 0.0F && multiplier < 1.0F) damage.scaleAmount(multiplier);
+    }
+
+    public static boolean preventDeath(EntityPlayer player, float healthAfter) {
+        if (player == null || player.onClient()) return false;
+        boolean phylactery = hasEquippedItem(player, PHYLACTERY::contains);
+        if (!phylactery && !hasEquippedItem(player, BROKEN_HEART::contains)) return false;
+
+        AttributeInstance maxHealth = player.getEntityAttribute(SharedMonsterAttributes.maxHealth);
+        if (maxHealth == null || maxHealth.getAttributeValue() + healthAfter < 1.0D) return false;
+
+        player.setHealth(Float.MIN_VALUE);
+        applyMaxHealthDrain(player, healthAfter);
+        if (phylactery) com.bountifulbaubles.item.BBTeleportItem.teleportToSpawn(player, player.worldObj);
+        return true;
+    }
+
+    private static void applyMaxHealthDrain(EntityPlayer player, float delta) {
+        AttributeInstance maxHealth = player.getEntityAttribute(SharedMonsterAttributes.maxHealth);
+        if (maxHealth == null || delta >= 0.0F) return;
+        AttributeModifier previous = maxHealth.getModifier(MAX_HEALTH_DRAIN_ID);
+        double previousAmount = previous == null ? 0.0D : previous.getAmount();
+        if (previous != null) maxHealth.removeModifier(previous);
+        maxHealth.applyModifier(new AttributeModifier(MAX_HEALTH_DRAIN_ID,
+            "Broken Heart max health drain", previousAmount + delta, 0).setSaved(true));
     }
 
     private static boolean hasEquippedItem(EntityLivingBase entity, java.util.function.Predicate<Item> predicate) {

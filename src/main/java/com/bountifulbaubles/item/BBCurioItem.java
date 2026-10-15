@@ -12,6 +12,7 @@ import net.minecraft.AttributeModifier;
 import net.minecraft.EntityLivingBase;
 import net.minecraft.Item;
 import net.minecraft.ItemStack;
+import net.xiaoyu233.fml.reload.utils.IdUtil;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
@@ -21,6 +22,7 @@ public class BBCurioItem extends Item implements ICurioItem {
     private final Multimap<Attribute, AttributeModifier> attributeModifiers = HashMultimap.create();
 
     public BBCurioItem(String... slotTypes) {
+        super(IdUtil.getNextItemID(), "bountifulbaubles:placeholder");
         setMaxStackSize(1);
         LinkedHashSet<String> types = new LinkedHashSet<String>(Arrays.asList(slotTypes));
         this.slotTypes = Collections.unmodifiableSet(types);

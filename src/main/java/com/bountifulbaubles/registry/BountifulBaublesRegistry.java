@@ -110,7 +110,9 @@ public final class BountifulBaublesRegistry implements IGameRegistry {
         amulet_sin_wrath = register("amulet_sin_wrath", "necklace")
             .addModifier(net.minecraft.SharedMonsterAttributes.attackDamage, "wrath", 2, 0);
         broken_heart = register("broken_heart", "necklace", "ring");
+        BBEffects.addBrokenHeart(broken_heart);
         phylactery_charm = register("phylactery_charm", "necklace", "ring");
+        BBEffects.addPhylactery(phylactery_charm);
         amulet_cross = register("amulet_cross", "necklace");
         gloves_dexterity = register("gloves_dexterity", "hands");
         gloves_digging_iron = register("gloves_digging_iron", "hands");
