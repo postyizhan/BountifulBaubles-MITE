@@ -2,6 +2,7 @@ package com.bountifulbaubles.mixin;
 
 import com.bountifulbaubles.equipment.BBEffects;
 import net.minecraft.Damage;
+import net.minecraft.EntityDamageResult;
 import net.minecraft.EntityPlayer;
 import net.minecraft.EnumItemInUseAction;
 import net.minecraft.ItemStack;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityPlayer.class)
 public abstract class EntityPlayerMixin {
@@ -34,7 +36,7 @@ public abstract class EntityPlayerMixin {
     }
 
     @Inject(method = "attackEntityFrom(Lnet/minecraft/Damage;)Lnet/minecraft/EntityDamageResult;", at = @At("HEAD"))
-    private void bountifulbaubles$reduceFireDamage(Damage damage, CallbackInfo info) {
+    private void bountifulbaubles$reduceFireDamage(Damage damage, CallbackInfoReturnable<EntityDamageResult> cir) {
         BBEffects.reduceFireDamage((EntityPlayer) (Object) this, damage);
     }
 
