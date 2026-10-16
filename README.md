@@ -8,6 +8,8 @@ Shields use their original cuboid models in the inventory, hand, and as dropped 
 
 ## Build
 
-Use Java 17 and run `./gradlew build`. The build expects the Curios-MITE artifact at `../Curios-MITE/build/libs/curios-mite-0.1.0.jar`; build Curios-MITE first when that file is missing. Curios is a required runtime dependency.
+Use Java 17 and run `./gradlew build`. Curios-MITE is resolved from the public Maven repository at `https://postyizhan.github.io/Curios-MITE/maven/`, so this repository can be cloned and built independently. Curios is a required runtime dependency. The coordinates are configurable through `curios_group`, `curios_artifact`, `curios_version`, and `curios_maven_url` in `gradle.properties` or with `-P` properties.
+
+For development runs, `runClient` and `runServer` automatically copy the resolved Curios-MITE jar into `run/mods`. Install the same Curios-MITE version in a released modpack; the BountifulBaubles jar does not bundle Curios.
 
 The item registration and slot tags are in place. Gameplay effects, recipes, loot injection, models, and client rendering are being migrated in focused steps; plain utility items currently retain their item identity without their original Forge-only behavior.

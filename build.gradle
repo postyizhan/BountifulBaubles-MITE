@@ -7,11 +7,18 @@ group = project.maven_group
 base.archivesName = project.archives_base_name
 
 repositories {
+    maven { name = 'CuriosMite'; url = uri(project.findProperty('curios_maven_url') ?: 'https://postyizhan.github.io/Curios-MITE/maven/') }
     maven { name = 'ModdedMITE'; url = 'https://maven.limingzxc.top/repository/maven-public/' }
     mavenCentral()
 }
 
-configurations { fml }
+configurations {
+    fml
+    curiosRuntime {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -20,20 +27,19 @@ dependencies {
     fml "com.github.MinecraftIsTooEasy:FishModLoader:${project.loader_version}"
     implementation "com.github.MinecraftIsTooEasy:FishModLoader:${project.loader_version}"
     implementation 'com.github.MinecraftIsTooEasy:RustedIronCore:1.5.5'
-    compileOnly files('../Curios-MITE/build/libs/curios-mite-0.1.0.jar')
+    compileOnly("${project.curios_group}:${project.curios_artifact}:${project.curios_version}") {
+        transitive = false
+    }
+    curiosRuntime("${project.curios_group}:${project.curios_artifact}:${project.curios_version}") {
+        transitive = false
+    }
 }
 
 def fmlResolvedFile = configurations.fml.singleFile
-def curiosRuntimeJar = file('../Curios-MITE/build/libs/curios-mite-0.1.0.jar')
 
 def syncCuriosRuntimeMod = tasks.register('syncCuriosRuntimeMod', Copy) {
-    from(curiosRuntimeJar)
+    from(configurations.curiosRuntime)
     into(layout.projectDirectory.dir('run/mods'))
-    doFirst {
-        if (!curiosRuntimeJar.isFile()) {
-            throw new GradleException("Curios-MITE runtime jar not found at ${curiosRuntimeJar}; build Curios-MITE first.")
-        }
-    }
 }
 
 tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
