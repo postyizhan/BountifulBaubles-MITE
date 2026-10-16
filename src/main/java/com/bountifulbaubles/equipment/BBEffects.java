@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.UUID;
 import net.minecraft.EntityLivingBase;
 import net.minecraft.EntityPlayer;
 import net.minecraft.AttributeInstance;
@@ -12,6 +13,8 @@ import net.minecraft.AttributeModifier;
 import net.minecraft.Item;
 import net.minecraft.ItemStack;
 import net.minecraft.SharedMonsterAttributes;
+import net.minecraft.Potion;
+import net.minecraft.PotionEffect;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -41,12 +44,43 @@ public final class BBEffects {
         Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
     private static final Set<Item> PHYLACTERY =
         Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> LEVITATION_IMMUNITY =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> EXTENDED_IFRAMES =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+    private static final Set<Item> FAST_TOOL_SWITCHING =
+        Collections.newSetFromMap(new IdentityHashMap<Item, Boolean>());
+
+    private static final UUID SINFUL_DAMAGE_ID =
+        UUID.fromString("d0b248eb-3abb-4584-9cc5-2aaa06146300");
+    private static Potion sinfulPotion;
+    private static final Map<EntityPlayer, Long> LAST_BROKEN_HEART_RECOVERY =
+        new java.util.WeakHashMap<EntityPlayer, Long>();
+    private static final Map<EntityLivingBase, Integer> ORIGINAL_IFRAMES =
+        new java.util.WeakHashMap<EntityLivingBase, Integer>();
 
     private static final float VANILLA_STEP_HEIGHT = 0.6F;
     private static final float ASSISTED_STEP_HEIGHT = 1.24993F;
     private static final float SNEAKING_STEP_HEIGHT = 0.60007F;
 
     private BBEffects() {}
+
+    /** Registers the one custom effect used by the sin pendants. */
+    public static synchronized void initialize() {
+        if (sinfulPotion != null) return;
+        int id = -1;
+        for (int candidate = 24; candidate < Potion.potionTypes.length; candidate++) {
+            if (Potion.potionTypes[candidate] == null) { id = candidate; break; }
+        }
+        if (id < 0) throw new IllegalStateException("No free potion id for bountifulbaubles:sinful");
+        sinfulPotion = new SinfulPotion(id);
+        Potion.potionTypes[id] = sinfulPotion;
+    }
+
+    public static Potion getSinfulPotion() {
+        initialize();
+        return sinfulPotion;
+    }
 
     public static synchronized void addPotionImmunity(Item item, int... potionIds) {
         Set<Integer> ids = POTION_IMMUNITY.computeIfAbsent(item, ignored -> new HashSet<Integer>());
@@ -93,11 +127,92 @@ public final class BBEffects {
         PHYLACTERY.add(item);
     }
 
+    public static synchronized void addLevitationImmunity(Item item) {
+        LEVITATION_IMMUNITY.add(item);
+    }
+
+    public static synchronized void addExtendedInvulnerability(Item item) {
+        EXTENDED_IFRAMES.add(item);
+    }
+
+    public static synchronized void addFastToolSwitching(Item item) {
+        FAST_TOOL_SWITCHING.add(item);
+    }
+
     public static boolean canApplyPotion(EntityLivingBase entity, int potionId) {
         return !hasEquippedItem(entity, item -> {
             Set<Integer> ids = POTION_IMMUNITY.get(item);
             return ids != null && ids.contains(potionId);
         });
+    }
+
+    public static boolean hasFastToolSwitching(EntityLivingBase entity) {
+        return hasEquippedItem(entity, FAST_TOOL_SWITCHING::contains);
+    }
+
+    public static void updateInvulnerabilityFrames(EntityLivingBase entity) {
+        if (entity == null) return;
+        if (hasEquippedItem(entity, EXTENDED_IFRAMES::contains)) {
+            ORIGINAL_IFRAMES.putIfAbsent(entity, entity.maxHurtResistantTime);
+            entity.maxHurtResistantTime = Math.max(entity.maxHurtResistantTime, 36);
+        } else {
+            Integer original = ORIGINAL_IFRAMES.remove(entity);
+            if (original != null) entity.maxHurtResistantTime = original.intValue();
+        }
+    }
+
+    public static void updatePlayer(EntityPlayer player) {
+        if (player == null || player.worldObj == null || player.worldObj.isRemote) return;
+        if (hasEquippedItem(player, item -> item == BountifulBaublesRegistryAccess.PRIDE)) {
+            if (player.getHealth() >= player.getMaxHealth()) {
+                player.addPotionEffect(new PotionEffect(getSinfulPotion().getId(), Integer.MAX_VALUE, 0, false));
+            } else if (player.isPotionActive(getSinfulPotion().getId())) {
+                player.removePotionEffect(getSinfulPotion().getId());
+            }
+        } else if (player.isPotionActive(getSinfulPotion().getId())) {
+            player.removePotionEffect(getSinfulPotion().getId());
+        }
+
+        long day = player.worldObj.getTotalWorldTime() / 24000L;
+        Long last = LAST_BROKEN_HEART_RECOVERY.get(player);
+        if (last == null || last.longValue() != day) {
+            LAST_BROKEN_HEART_RECOVERY.put(player, day);
+            recoverBrokenHeart(player);
+        }
+    }
+
+    public static void onFoodEaten(EntityPlayer player, ItemStack stack) {
+        if (player == null || stack == null || !hasEquippedItem(player, item -> item == BountifulBaublesRegistryAccess.GLUTTONY)) return;
+        if (stack.getItem() != null && stack.getItem().isEatable(stack)) {
+            player.addPotionEffect(new PotionEffect(getSinfulPotion().getId(), 200, 0, true));
+        }
+    }
+
+    public static void onCriticalHit(EntityPlayer player) {
+        if (player != null && hasEquippedItem(player, item -> item == BountifulBaublesRegistryAccess.WRATH)) {
+            player.addPotionEffect(new PotionEffect(getSinfulPotion().getId(), 120, 3, true));
+        }
+    }
+
+    public static void onWakeUp(EntityPlayer player) {
+        if (player != null && !player.worldObj.isRemote) recoverBrokenHeart(player);
+    }
+
+    private static void recoverBrokenHeart(EntityPlayer player) {
+        if (!hasEquippedItem(player, BROKEN_HEART::contains) && !hasEquippedItem(player, PHYLACTERY::contains)) return;
+        AttributeInstance maxHealth = player.getEntityAttribute(SharedMonsterAttributes.maxHealth);
+        if (maxHealth == null) return;
+        AttributeModifier previous = maxHealth.getModifier(MAX_HEALTH_DRAIN_ID);
+        if (previous == null) return;
+        double restored = previous.getAmount() + 2.0D;
+        maxHealth.removeModifier(previous);
+        if (restored < 0.0D) {
+            maxHealth.applyModifier(new AttributeModifier(MAX_HEALTH_DRAIN_ID,
+                "Broken Heart max health drain", restored, 0).setSaved(true));
+            player.addChatMessage("item.bountifulbaubles.broken_heart.partial_heal");
+        } else {
+            player.addChatMessage("item.bountifulbaubles.broken_heart.full_heal");
+        }
     }
 
     public static boolean isFireImmune(EntityLivingBase entity) {
@@ -148,7 +263,9 @@ public final class BBEffects {
 
         player.setHealth(Float.MIN_VALUE);
         applyMaxHealthDrain(player, healthAfter);
-        if (phylactery) com.bountifulbaubles.item.BBTeleportItem.teleportToSpawn(player, player.worldObj);
+        if (phylactery && player.worldObj.isOverworld()) {
+            com.bountifulbaubles.item.BBTeleportItem.teleportToSpawn(player, player.worldObj);
+        }
         return true;
     }
 
@@ -201,5 +318,21 @@ public final class BBEffects {
             }
             return minimum;
         }).orElse(defaultValue);
+    }
+
+    /** Registry indirection keeps the effect class independent of item initialization order. */
+    public static final class BountifulBaublesRegistryAccess {
+        public static Item PRIDE;
+        public static Item GLUTTONY;
+        public static Item WRATH;
+        private BountifulBaublesRegistryAccess() {}
+    }
+
+    private static final class SinfulPotion extends Potion {
+        private SinfulPotion(int id) {
+            super(id, false, 0x101317);
+            setPotionName("potion.bountifulbaubles.sinful");
+            func_111184_a(SharedMonsterAttributes.attackDamage, SINFUL_DAMAGE_ID.toString(), 0.25D, 2);
+        }
     }
 }

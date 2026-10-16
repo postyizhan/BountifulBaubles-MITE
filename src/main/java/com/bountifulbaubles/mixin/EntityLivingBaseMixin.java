@@ -40,6 +40,11 @@ public abstract class EntityLivingBaseMixin {
             BBEffects.getJumpBoost((EntityLivingBase) (Object) this);
     }
 
+    @Inject(method = "onLivingUpdate()V", at = @At("TAIL"))
+    private void bountifulbaubles$extendedInvulnerability(CallbackInfo info) {
+        BBEffects.updateInvulnerabilityFrames((EntityLivingBase) (Object) this);
+    }
+
     @ModifyArg(
         method = "attackEntityFromHelper(Lnet/minecraft/Damage;Lnet/minecraft/EntityDamageResult;)Lnet/minecraft/EntityDamageResult;",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;setHealth(F)V"),

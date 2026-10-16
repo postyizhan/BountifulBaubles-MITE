@@ -10,20 +10,17 @@ import com.google.common.collect.Multimap;
 import net.minecraft.Attribute;
 import net.minecraft.AttributeModifier;
 import net.minecraft.EntityLivingBase;
-import net.minecraft.Item;
 import net.minecraft.ItemStack;
-import net.xiaoyu233.fml.reload.utils.IdUtil;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 /** Base item for BB accessories whose first integration point is Curios-MITE. */
-public class BBCurioItem extends Item implements ICurioItem {
+public class BBCurioItem extends BBItem implements ICurioItem {
     private final Set<String> slotTypes;
     private final Multimap<Attribute, AttributeModifier> attributeModifiers = HashMultimap.create();
 
     public BBCurioItem(String... slotTypes) {
-        super(IdUtil.getNextItemID(), "bountifulbaubles:placeholder");
-        setMaxStackSize(1);
+        super(1);
         LinkedHashSet<String> types = new LinkedHashSet<String>(Arrays.asList(slotTypes));
         this.slotTypes = Collections.unmodifiableSet(types);
     }
@@ -47,9 +44,7 @@ public class BBCurioItem extends Item implements ICurioItem {
             }
 
             @Override
-            public boolean canRightClickEquip() {
-                return true;
-            }
+            public boolean canRightClickEquip() { return BBCurioItem.this.canRightClickEquip(); }
 
             @Override
             public void onEquip(String identifier, int index, EntityLivingBase entity) {
@@ -78,4 +73,6 @@ public class BBCurioItem extends Item implements ICurioItem {
     protected void onUnequip(String identifier, int index, EntityLivingBase entity, ItemStack stack) {}
 
     protected void curioTick(String identifier, int index, EntityLivingBase entity, ItemStack stack) {}
+
+    protected boolean canRightClickEquip() { return true; }
 }

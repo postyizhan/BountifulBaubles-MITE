@@ -17,10 +17,34 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class EntityPlayerMixin {
     @Shadow protected ItemStack itemInUse;
     @Shadow protected int itemInUseCount;
+    @org.spongepowered.asm.mixin.Unique private int bountifulbaubles$lastSelectedSlot = -1;
 
     @Inject(method = "onUpdate()V", at = @At("TAIL"))
     private void bountifulbaubles$updateStepAssist(CallbackInfo info) {
-        BBEffects.updateStepHeight((EntityPlayer) (Object) this);
+        EntityPlayer player = (EntityPlayer) (Object) this;
+        BBEffects.updateStepHeight(player);
+        BBEffects.updatePlayer(player);
+        int selected = player.inventory == null ? -1 : player.inventory.currentItem;
+        if (bountifulbaubles$lastSelectedSlot >= 0 && selected != bountifulbaubles$lastSelectedSlot
+            && BBEffects.hasFastToolSwitching(player)) {
+            player.attackTime = 0;
+        }
+        bountifulbaubles$lastSelectedSlot = selected;
+    }
+
+    @Inject(method = "onItemUseFinish()V", at = @At("HEAD"))
+    private void bountifulbaubles$sinGluttony(CallbackInfo info) {
+        BBEffects.onFoodEaten((EntityPlayer) (Object) this, itemInUse);
+    }
+
+    @Inject(method = "onCriticalHit(Lnet/minecraft/Entity;)V", at = @At("HEAD"))
+    private void bountifulbaubles$sinWrath(net.minecraft.Entity target, CallbackInfo info) {
+        BBEffects.onCriticalHit((EntityPlayer) (Object) this);
+    }
+
+    @Inject(method = "wakeUpPlayer(ZLnet/minecraft/Entity;)V", at = @At("TAIL"))
+    private void bountifulbaubles$brokenHeartRecovery(boolean immediately, net.minecraft.Entity entity, CallbackInfo info) {
+        BBEffects.onWakeUp((EntityPlayer) (Object) this);
     }
 
     @Inject(method = "updateItemUse(Lnet/minecraft/ItemStack;I)V", at = @At("HEAD"))
