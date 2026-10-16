@@ -57,6 +57,7 @@ item.bountifulbaubles.potion_wormhole.request_sent=已发送传送请求。
 item.bountifulbaubles.potion_wormhole.request=有玩家请求虫洞传送。使用虫洞物品以确认。
 item.bountifulbaubles.potion_wormhole.accepted=传送请求已确认。
 item.bountifulbaubles.potion_wormhole.accepted_target=你已被传送到这里。
+item.bountifulbaubles.potion_wormhole.request_expired=虫洞传送请求已过期。
 item.bountifulbaubles.balloon.name=气球
 item.bountifulbaubles.balloon.tooltip.0=§9增加跳跃高度，降低摔落伤害。
 item.bountifulbaubles.lucky_horseshoe.name=幸运马蹄

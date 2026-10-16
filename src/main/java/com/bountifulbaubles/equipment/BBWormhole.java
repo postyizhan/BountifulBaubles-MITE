@@ -9,14 +9,20 @@ import net.minecraft.ItemStack;
 
 /** Server-side target selection and confirmation for wormhole items. */
 public final class BBWormhole {
-    private static final Map<EntityPlayer, EntityPlayer> REQUESTS =
-        new WeakHashMap<EntityPlayer, EntityPlayer>();
+    private static final Map<EntityPlayer, PendingRequest> REQUESTS =
+        new WeakHashMap<EntityPlayer, PendingRequest>();
 
     private BBWormhole() {}
 
     public static synchronized void open(EntityPlayer player) {
         if (player == null || player.worldObj == null || player.worldObj.isRemote) return;
-        EntityPlayer origin = REQUESTS.remove(player);
+        PendingRequest pending = REQUESTS.remove(player);
+        EntityPlayer origin = pending == null ? null : pending.origin;
+        if (pending != null && player.worldObj.getTotalWorldTime() - pending.tick > 400L) {
+            if (origin != null) origin.addChatMessage("item.bountifulbaubles.potion_wormhole.request_expired");
+            player.addChatMessage("item.bountifulbaubles.potion_wormhole.request_expired");
+            origin = null;
+        }
         if (origin != null && isValid(origin, player)) {
             if (!consume(origin)) {
                 origin.addChatMessage("item.bountifulbaubles.potion_wormhole.noitem");
@@ -33,7 +39,7 @@ public final class BBWormhole {
             player.addChatMessage("item.bountifulbaubles.potion_wormhole.nootherplayers");
             return;
         }
-        REQUESTS.put(target, player);
+        REQUESTS.put(target, new PendingRequest(player, player.worldObj.getTotalWorldTime()));
         player.addChatMessage("item.bountifulbaubles.potion_wormhole.request_sent");
         target.addChatMessage("item.bountifulbaubles.potion_wormhole.request");
     }
@@ -85,5 +91,15 @@ public final class BBWormhole {
     private static void teleport(EntityPlayer origin, EntityPlayer target) {
         origin.setPositionAndUpdate(target.posX, target.posY, target.posZ);
         origin.fallDistance = 0.0F;
+    }
+
+    private static final class PendingRequest {
+        private final EntityPlayer origin;
+        private final long tick;
+
+        private PendingRequest(EntityPlayer origin, long tick) {
+            this.origin = origin;
+            this.tick = tick;
+        }
     }
 }

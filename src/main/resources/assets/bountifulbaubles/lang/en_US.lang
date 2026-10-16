@@ -57,6 +57,7 @@ item.bountifulbaubles.potion_wormhole.request_sent=Teleport request sent.
 item.bountifulbaubles.potion_wormhole.request=A player has requested a wormhole teleport. Use a wormhole item to accept.
 item.bountifulbaubles.potion_wormhole.accepted=Teleport request accepted.
 item.bountifulbaubles.potion_wormhole.accepted_target=You were teleported here.
+item.bountifulbaubles.potion_wormhole.request_expired=The wormhole teleport request expired.
 item.bountifulbaubles.balloon.name=Balloon
 item.bountifulbaubles.balloon.tooltip.0=§9Higher jumps and reduced fall damage.
 item.bountifulbaubles.lucky_horseshoe.name=Lucky Horseshoe
