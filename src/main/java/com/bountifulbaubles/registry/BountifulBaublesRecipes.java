@@ -56,6 +56,10 @@ public final class BountifulBaublesRecipes {
     private static synchronized boolean registerRecipes() {
         if (registered) return true;
         if (!itemsReady()) return false;
+        // Vanilla skulls are loot, but MITE does not assign them a component difficulty.
+        if (Item.skull.getCraftingDifficultyAsComponent(new ItemStack(Item.skull)) < 0.0F) {
+            Item.skull.setCraftingDifficultyAsComponent(0.0F);
+        }
         CraftingManagerInvoker recipes = (CraftingManagerInvoker) CraftingManager.getInstance();
         recipes.addRecipe(stack(BountifulBaublesRegistry.amulet_sin_gluttony), true,
             "c", "a", "g", 'c', Item.cake, 'a', BountifulBaublesRegistry.amulet_sin_empty,
