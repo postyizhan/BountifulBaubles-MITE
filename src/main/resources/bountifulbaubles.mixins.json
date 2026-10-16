@@ -4,6 +4,7 @@
   "package": "com.bountifulbaubles.mixin",
   "compatibilityLevel": "JAVA_17",
   "target": "DEFAULT",
-  "mixins": ["ContainerRepairMixin", "DamageShieldMixin", "EntityLivingBaseMixin", "EntityPlayerMixin", "EntityPlayerDiggingMixin", "ItemInWorldManagerDiggingMixin"],
+  "mixins": ["ContainerRepairMixin", "CuriosAttributeCompatibilityMixin", "DamageShieldMixin", "EntityLivingBaseMixin", "EntityPlayerMixin", "EntityPlayerDiggingMixin", "ItemInWorldManagerDiggingMixin"],
+  "client": ["ShieldItemRendererMixin", "ShieldRenderItemMixin"],
   "injectors": {"defaultRequire": 1}
 }
