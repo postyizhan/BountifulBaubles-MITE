@@ -45,6 +45,14 @@ public abstract class EntityLivingBaseMixin {
         BBEffects.updateInvulnerabilityFrames((EntityLivingBase) (Object) this);
     }
 
+    @Inject(method = "getNaturalDefense(Lnet/minecraft/DamageSource;)F", at = @At("RETURN"), cancellable = true)
+    private void bountifulbaubles$sinfulArmor(net.minecraft.DamageSource source,
+                                               CallbackInfoReturnable<Float> cir) {
+        if (BBEffects.hasSinfulBuff((EntityLivingBase) (Object) this)) {
+            cir.setReturnValue(cir.getReturnValue() + 3.0F);
+        }
+    }
+
     @ModifyArg(
         method = "attackEntityFromHelper(Lnet/minecraft/Damage;Lnet/minecraft/EntityDamageResult;)Lnet/minecraft/EntityDamageResult;",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;setHealth(F)V"),

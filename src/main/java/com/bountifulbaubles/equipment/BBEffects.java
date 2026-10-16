@@ -150,6 +150,10 @@ public final class BBEffects {
         return hasEquippedItem(entity, FAST_TOOL_SWITCHING::contains);
     }
 
+    public static boolean hasSinfulBuff(EntityLivingBase entity) {
+        return entity != null && entity.isPotionActive(getSinfulPotion().getId());
+    }
+
     public static void updateInvulnerabilityFrames(EntityLivingBase entity) {
         if (entity == null) return;
         if (hasEquippedItem(entity, EXTENDED_IFRAMES::contains)) {
